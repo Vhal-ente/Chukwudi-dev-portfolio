@@ -24,6 +24,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,  
+    "types": ["node"],
     // This is the key fix for Zod:
     "exactOptionalPropertyTypes": false
   },
