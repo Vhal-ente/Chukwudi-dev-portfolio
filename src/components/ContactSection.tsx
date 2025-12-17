@@ -42,21 +42,59 @@ export function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Message sent!",
-      description: "Thank you for reaching out. I'll get back to you soon.",
-    });
-    
-    setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
+// In ContactSection.tsx - Update the handleSubmit function
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+  
+  // Get form data - ensure inputs have these 'name' attributes
+  const payload = {
+    name: formData.get('name') as string,
+    email: formData.get('email') as string,
+    subject: formData.get('subject') as string,
+    message: formData.get('message') as string,
   };
+
+  try {
+    // USE YOUR RENDER BACKEND URL HERE
+    const backendUrl = import.meta.env?.VITE_API_URL || 'https://portfolio-backend.onrender.com';
+    
+    const response = await fetch(`${backendUrl}/api/contact`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      toast({
+        title: 'Success!',
+        description: result.message || 'Your message has been sent successfully.',
+        duration: 5000,
+      });
+      form.reset(); // Clear the form
+    } else {
+      throw new Error(result.error || 'Failed to send message');
+    }
+  } catch (error) {
+    console.error('Contact form error:', error);
+    toast({
+      title: 'Error',
+      description: error instanceof Error ? error.message : 'Could not send your message. Please try again later.',
+      variant: 'destructive',
+      duration: 5000,
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <section id="contact" className="py-20 md:py-32 relative bg-secondary/30">
@@ -140,6 +178,7 @@ export function ContactSection() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Name</label>
                     <Input
+                    name="name"
                       placeholder="Your name"
                       required
                       className="bg-background/50"
@@ -148,6 +187,7 @@ export function ContactSection() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">Email</label>
                     <Input
+                    name="email"
                       type="email"
                       placeholder="your@email.com"
                       required
@@ -158,6 +198,7 @@ export function ContactSection() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Subject</label>
                   <Input
+                  name="subject"
                     placeholder="What's this about?"
                     required
                     className="bg-background/50"
@@ -166,6 +207,7 @@ export function ContactSection() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Message</label>
                   <Textarea
+                  name="message"
                     placeholder="Your message..."
                     rows={5}
                     required

@@ -45,18 +45,17 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // ==================== EMAIL TRANSPORTER ====================
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  secure: false,  
   auth: {
-    user: config.EMAIL_USER,
-    pass: config.EMAIL_PASSWORD,
+    user: 'apikey',  
+    pass: process.env.EMAIL_PASSWORD  
   },
+
   pool: true,
-  maxConnections: 5,
-  maxMessages: 100,
-  secure: true,
-  tls: {
-    rejectUnauthorized: false, // Required for some email providers
-  },
+  maxConnections: 3,
+  maxMessages: 100
 });
 
 // Verify transporter on startup
