@@ -1,0 +1,37 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev": "nodemon src/server.ts",
+    "dev:ts": "ts-node src/server.ts",
+    "prestart": "npm run build"
+  },
+  "keywords": ["portfolio", "backend", "contact-form"],
+  "author": "Valentine Nwobi",
+  "license": "ISC",
+  "description": "Backend API for portfolio contact form with email functionality",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "nodemailer": "^6.10.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/nodemailer": "^6.4.17",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
