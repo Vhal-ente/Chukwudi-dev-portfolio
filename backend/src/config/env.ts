@@ -5,7 +5,7 @@ const envSchema = z.object({
   EMAIL_USER: z.string(),
   EMAIL_PASSWORD: z.string(),
   ALLOWED_ORIGIN: z.string(),
-  PORT: z.coerce.number().default(5000),
+  PORT: z.coerce.number().default(10000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 

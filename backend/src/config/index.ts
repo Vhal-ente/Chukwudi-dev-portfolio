@@ -9,7 +9,7 @@ const envSchema = z.object({
   ALLOWED_ORIGIN: z.string(),
   
   // Optional variables with defaults
-  PORT: z.coerce.number().default(5000),
+  PORT: z.coerce.number().default(10000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   
   // Optional feature flags
@@ -32,7 +32,7 @@ function parseEnv(): EnvConfig {
     console.error('EMAIL_USER=valentinenwobi9@gmail.com');
     console.error('EMAIL_PASSWORD=xxxx xxxx xxxx xxxx');
     console.error('ALLOWED_ORIGIN=http://localhost:3000');
-    console.error('PORT=5000');
+    console.error('PORT=10000');
     console.error('NODE_ENV=development');
     throw new Error('Configuration incomplete');
   }
