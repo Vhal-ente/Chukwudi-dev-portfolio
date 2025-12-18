@@ -7,7 +7,7 @@ const skillCategories = [
       { name: "TypeScript", level: 90 },
       { name: "JavaScript", level: 95 },
       { name: "Tailwind CSS", level: 90 },
-      { name: "Redux", level: 85 },
+      { name: "Redux", level: 75 },
     ],
   },
   {
@@ -15,8 +15,8 @@ const skillCategories = [
     skills: [
       { name: "Node.js", level: 85 },
       { name: "Express.js", level: 80 },
-      { name: "Adonis.js", level: 75 },
-      { name: "Python", level: 70 },
+      { name: "Adonis.js", level: 55 },
+      { name: "Python", level: 25 },
       { name: "REST APIs", level: 90 },
     ],
   },
@@ -25,7 +25,7 @@ const skillCategories = [
     skills: [
       { name: "PostgreSQL", level: 85 },
       { name: "MySQL", level: 85 },
-      { name: "MongoDB", level: 80 },
+      { name: "MongoDB", level: 70 },
       { name: "SQLite", level: 80 },
       { name: "Sequelize", level: 80 },
     ],
@@ -35,7 +35,7 @@ const skillCategories = [
     skills: [
       { name: "Git & GitHub", level: 90 },
       { name: "Agile/Scrum", level: 90 },
-      { name: "Testing", level: 80 },
+      { name: "Testing", level: 70 },
       { name: "CI/CD", level: 75 },
       { name: "Cloudinary", level: 80 },
     ],
