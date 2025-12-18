@@ -1,11 +1,10 @@
-// src/config/index.ts - COMPLETE WORKING VERSION
+// src/config/index.ts - UPDATED FOR RESEND
 import { z } from 'zod';
 
 // ========== 1. SCHEMA DEFINITION ==========
 const envSchema = z.object({
-  // Required variables
-  EMAIL_USER: z.string(),
-  EMAIL_PASSWORD: z.string(),
+  // Required variables for Resend
+  RESEND_API_KEY: z.string(),
   ALLOWED_ORIGIN: z.string(),
   
   // Optional variables with defaults
@@ -15,6 +14,10 @@ const envSchema = z.object({
   // Optional feature flags
   ENABLE_AUTO_REPLY: z.coerce.boolean().default(true),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  
+  // Email addresses
+  FROM_EMAIL: z.string().default('Portfolio Contact <contact@yourdomain.com>'),
+  TO_EMAIL: z.string().default('valentinenwobi9@gmail.com'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
@@ -22,37 +25,38 @@ export type EnvConfig = z.infer<typeof envSchema>;
 // ========== 2. VALIDATION & PARSING ==========
 function parseEnv(): EnvConfig {
   // Check required variables first (simple check)
-  const required = ['EMAIL_USER', 'EMAIL_PASSWORD', 'ALLOWED_ORIGIN'];
+  const required = ['RESEND_API_KEY', 'ALLOWED_ORIGIN'];
   const missing = required.filter(key => !process.env[key]);
   
   if (missing.length > 0) {
     console.error('❌ Configuration Error');
     console.error(`Missing required environment variables: ${missing.join(', ')}`);
     console.error('\n📋 Create a .env file with:');
-    console.error('EMAIL_USER=valentinenwobi9@gmail.com');
-    console.error('EMAIL_PASSWORD=xxxx xxxx xxxx xxxx');
-    console.error('ALLOWED_ORIGIN=http://localhost:3000');
+    console.error('RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx');
+    console.error('ALLOWED_ORIGIN=http://localhost:8080');
     console.error('PORT=10000');
     console.error('NODE_ENV=development');
+    console.error('FROM_EMAIL=Portfolio Contact <contact@yourdomain.com>');
+    console.error('TO_EMAIL=valentinenwobi9@gmail.com');
     throw new Error('Configuration incomplete');
   }
   
   // Parse with Zod (for defaults and type coercion)
   const envData = {
-    EMAIL_USER: process.env.EMAIL_USER!,
-    EMAIL_PASSWORD: process.env.EMAIL_PASSWORD!,
+    RESEND_API_KEY: process.env.RESEND_API_KEY!,
     ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN!,
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,
     ENABLE_AUTO_REPLY: process.env.ENABLE_AUTO_REPLY,
     LOG_LEVEL: process.env.LOG_LEVEL,
+    FROM_EMAIL: process.env.FROM_EMAIL,
+    TO_EMAIL: process.env.TO_EMAIL,
   };
   
   const result = envSchema.safeParse(envData);
   
   if (!result.success) {
     console.error('❌ Configuration parsing error');
-    // Simple error display without complex ZodError handling
     console.error('Check your .env file values');
     throw new Error('Configuration parsing failed');
   }
@@ -78,7 +82,7 @@ export const config = {
   
   get serverUrl(): string {
     return this.isProduction 
-      ? 'https://your-backend-url.com'
+      ? 'https://portfolio-backend-hesu.onrender.com'
       : `http://localhost:${rawConfig.PORT}`;
   },
   

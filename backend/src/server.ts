@@ -1,16 +1,19 @@
-// src/server.ts - COMPLETE WORKING VERSION
+// src/server.ts - UPDATED FOR RESEND
 import express, { Express, Request, Response, NextFunction } from 'express';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import cors from 'cors';
-import { config } from './config'; // Fixed import path
+import { config } from './config';
 
-// Type imports (create these if they don't exist)
+// Type imports
 interface ContactFormData {
   name: string;
   email: string;
   subject: string;
   message: string;
 }
+
+// ==================== INITIALIZE RESEND ====================
+const resend = new Resend(config.RESEND_API_KEY);
 
 // ==================== MIDDLEWARE ====================
 const app: Express = express();
@@ -33,7 +36,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   
   console.log(`[${timestamp}] ${method} ${url} - IP: ${ip}`);
   
-  // Add response time tracking
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
@@ -41,37 +43,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   });
   
   next();
-});
-
-// ==================== EMAIL TRANSPORTER ====================
-const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 465,
-  secure: true,  
-  auth: {
-    user: 'apikey',  
-    pass: process.env.EMAIL_PASSWORD  
-  },
-
-  pool: true,
-  maxConnections: 5,
-  maxMessages: 100
-});
-
-// Verify transporter on startup
-transporter.verify((error: Error | null) => {
-  if (error) {
-    console.error(`❌ Email configuration error: ${error.message}`);
-    
-    // Don't exit in development for easier testing
-    if (config.isProduction) {
-      console.error('Email service is required for production.');
-      // Consider whether to exit - maybe just log and continue
-      // process.exit(1);
-    }
-  } else {
-    console.log('✅ Email server is ready to send messages.');
-  }
 });
 
 // ==================== RATE LIMITING ====================
@@ -93,7 +64,6 @@ const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) =>
   
   const record = requestCounts.get(ip)!;
   
-  // Reset counter if window has passed
   if (now > record.resetTime) {
     record.count = 1;
     record.resetTime = now + RATE_LIMIT_WINDOW_MS;
@@ -101,7 +71,6 @@ const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) =>
     return next();
   }
   
-  // Check if limit exceeded
   if (record.count >= MAX_REQUESTS_PER_WINDOW) {
     const retryAfter = Math.ceil((record.resetTime - now) / 1000);
     res.setHeader('Retry-After', retryAfter.toString());
@@ -115,7 +84,6 @@ const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) =>
     return;
   }
   
-  // Increment counter
   record.count++;
   requestCounts.set(ip, record);
   next();
@@ -125,7 +93,6 @@ const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) =>
 const validateContactRequest = (req: Request, res: Response, next: NextFunction) => {
   const { name, email, subject, message } = req.body;
   
-  // Check required fields
   if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
     res.status(400).json({ 
       success: false, 
@@ -135,7 +102,6 @@ const validateContactRequest = (req: Request, res: Response, next: NextFunction)
     return;
   }
   
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     res.status(400).json({ 
@@ -146,7 +112,6 @@ const validateContactRequest = (req: Request, res: Response, next: NextFunction)
     return;
   }
   
-  // Validate lengths using constants
   const MAX_NAME_LENGTH = 100;
   const MAX_SUBJECT_LENGTH = 200;
   const MAX_MESSAGE_LENGTH = config.constants.MAX_MESSAGE_LENGTH;
@@ -178,7 +143,6 @@ const validateContactRequest = (req: Request, res: Response, next: NextFunction)
     return;
   }
   
-  // Sanitize input
   req.body.name = name.trim();
   req.body.email = email.trim().toLowerCase();
   req.body.subject = subject.trim();
@@ -210,12 +174,11 @@ app.get('/api/config', (req: Request, res: Response) => {
     return;
   }
   
-  // Return safe configuration info (no passwords)
   res.json({
     environment: config.NODE_ENV,
     port: config.PORT,
     allowedOrigin: config.ALLOWED_ORIGIN,
-    emailUser: config.EMAIL_USER ? 'configured' : 'not configured',
+    resendConfigured: config.RESEND_API_KEY ? 'configured' : 'not configured',
     enableAutoReply: config.ENABLE_AUTO_REPLY,
     logLevel: config.LOG_LEVEL,
     timestamp: new Date().toISOString(),
@@ -231,25 +194,12 @@ app.post('/api/contact',
   const { name, email, subject, message } = req.body;
   
   try {
-    // Prepare email to yourself (portfolio owner)
-    const ownerMailOptions = {
-      from: `"Portfolio Contact" <{valentinenwobi9@gmail.com}>`,
-      to: config.EMAIL_USER,
+    // 1. Send email to yourself (portfolio owner)
+    const ownerEmail = await resend.emails.send({
+      from: config.FROM_EMAIL,
+      to: config.TO_EMAIL,
       replyTo: email,
       subject: `📨 Portfolio Contact: ${subject}`,
-      text: `
-New message from your portfolio website:
-
-Name: ${name}
-Email: ${email}
-Subject: ${subject}
-
-Message:
-${message}
-
----
-Sent from your portfolio contact form at ${new Date().toISOString()}
-      `,
       html: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -275,32 +225,33 @@ Sent from your portfolio contact form at ${new Date().toISOString()}
   </div>
 </div>
       `,
-    };
+      text: `
+New message from your portfolio website:
 
-    // Send email to yourself
-    await transporter.sendMail(ownerMailOptions);
-    
-    // Send auto-reply to sender (if enabled)
-    if (config.ENABLE_AUTO_REPLY) {
-      try {
-        const userMailOptions = {
-          from: `"Valentine Nwobi" <${config.EMAIL_USER}>`,
-          to: email,
-          subject: `Thanks for your message: ${subject}`,
-          text: `
-Hello ${name},
+Name: ${name}
+Email: ${email}
+Subject: ${subject}
 
-Thank you for reaching out through my portfolio website!
-
-I've received your message regarding "${subject}" and will review it shortly. I typically respond within 24-48 hours.
-
-Best regards,
-Valentine Nwobi
-Full-Stack Developer
+Message:
+${message}
 
 ---
-This is an automated confirmation.
-          `,
+Sent from your portfolio contact form at ${new Date().toISOString()}
+      `,
+    });
+
+    if (ownerEmail.error) {
+      console.error('❌ Failed to send owner email:', ownerEmail.error);
+      throw ownerEmail.error;
+    }
+    
+    // 2. Send auto-reply to sender (if enabled)
+    if (config.ENABLE_AUTO_REPLY) {
+      try {
+        const userEmail = await resend.emails.send({
+          from: config.FROM_EMAIL,
+          to: email,
+          subject: `Thanks for your message: ${subject}`,
           html: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
@@ -322,13 +273,27 @@ This is an automated confirmation.
   </div>
 </div>
           `,
-        };
-        
-        await transporter.sendMail(userMailOptions);
-        console.log(`✅ Auto-reply sent to: ${email}`);
+          text: `
+Hello ${name},
+
+Thank you for reaching out through my portfolio website!
+
+I've received your message regarding "${subject}" and will review it shortly. I typically respond within 24-48 hours.
+
+Best regards,
+Valentine Nwobi
+Full-Stack Developer
+
+---
+This is an automated confirmation.
+          `,
+        });
+
+        if (userEmail.data) {
+          console.log(`✅ Auto-reply sent to: ${email}`);
+        }
       } catch (autoReplyError) {
         console.warn(`⚠️ Could not send auto-reply:`, autoReplyError);
-        // Continue even if auto-reply fails
       }
     }
     
@@ -343,13 +308,10 @@ This is an automated confirmation.
   } catch (error: any) {
     console.error('❌ Email send error:', error);
     
-    // User-friendly error messages
     let userMessage = 'Failed to send your message. Please try again in a few minutes.';
     
-    if (error.code === 'EAUTH') {
-      userMessage = 'Email service configuration error.';
-    } else if (error.code === 'EENVELOPE') {
-      userMessage = 'Invalid email address.';
+    if (error.message?.includes('Unauthorized')) {
+      userMessage = 'Email service configuration error. Check your API key.';
     }
     
     res.status(500).json({ 
@@ -383,19 +345,14 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 
 // ==================== SERVER STARTUP ====================
 const PORT = config.PORT;
-const HOST = '0.0.0.0'; // Required for Render
+const HOST = '0.0.0.0';
 
-// Graceful shutdown handlers
 const gracefulShutdown = () => {
   console.log('Shutting down gracefully...');
-  
-  transporter.close();
-  
   setTimeout(() => {
     console.log('Force shutdown');
     process.exit(1);
   }, 10000).unref();
-  
   process.exit(0);
 };
 

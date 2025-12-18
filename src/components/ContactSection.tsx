@@ -87,7 +87,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.error('Contact form error:', error);
     toast({
       title: 'Error',
-      description: error instanceof Error ? error.message : 'Could not send your message. Please try again later.',
+      description: 'Could not send your message. Please try again later.',
       variant: 'destructive',
       duration: 5000,
     });
