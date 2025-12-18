@@ -46,15 +46,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ==================== EMAIL TRANSPORTER ====================
 const transporter = nodemailer.createTransport({
   host: 'smtp.sendgrid.net',
-  port: 587,
-  secure: false,  
+  port: 465,
+  secure: true,  
   auth: {
     user: 'apikey',  
     pass: process.env.EMAIL_PASSWORD  
   },
 
   pool: true,
-  maxConnections: 3,
+  maxConnections: 5,
   maxMessages: 100
 });
 
