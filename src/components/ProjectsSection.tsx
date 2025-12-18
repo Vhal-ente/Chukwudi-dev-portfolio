@@ -1,12 +1,12 @@
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import projectVertex from "@/assets/project-vertex.jpg";
-import projectSafelto from "@/assets/project-safelto.jpg";
-import projectVirgas from "@/assets/project-virgas.jpg";
-import projectCrossshield from "@/assets/project-crossshield.jpg";
+import projectVertex from "@/assets/AI-readiness-checker.png";
+import projectSafelto from "@/assets/Safelto.png";
+import projectVirgas from "@/assets/Virgas.png";
+import projectCrossshield from "@/assets/Crossshieldhc.png";
 import projectClosestead from "@/assets/project-closestead.jpg";
-import projectImmigration from "@/assets/project-immigration.jpg";
+import projectImmigration from "@/assets/immigrationpath2canada.png";
 
 interface Project {
   title: string;
