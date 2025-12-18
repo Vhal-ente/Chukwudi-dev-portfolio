@@ -233,7 +233,7 @@ app.post('/api/contact',
   try {
     // Prepare email to yourself (portfolio owner)
     const ownerMailOptions = {
-      from: `"Portfolio Contact" <${config.EMAIL_USER}>`,
+      from: `"Portfolio Contact" <{valentinenwobi9@gmail.com}>`,
       to: config.EMAIL_USER,
       replyTo: email,
       subject: `📨 Portfolio Contact: ${subject}`,
