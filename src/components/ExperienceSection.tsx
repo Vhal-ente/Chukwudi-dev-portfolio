@@ -22,6 +22,16 @@ const experiences = [
     ],
   },
   {
+    company: "Echez Tech Hub",
+    role: "Frontend Engineer",
+    period: "January 2026 - Present",
+    location: "Remote",
+    description: [
+      "Contributed to the development of a technology hub platform using Next.js, TypeScript, Tailwind CSS, and React Query",
+      "Collaborated with cross-functional teams to implement features and optimize performance",
+    ],
+  },
+  {
     company: "MephaltiHQ",
     role: "Frontend Engineer",
     period: "Aug 2024 - Dec 2024",

@@ -1,4 +1,4 @@
-import { Code2, Users, Lightbulb, Rocket } from "lucide-react";
+import { Code2, Users, Lightbulb, Rocket, Icon, icons } from "lucide-react";
 
 const highlights = [
   {
@@ -43,8 +43,8 @@ export function AboutSection() {
                 in designing scalable solutions that contribute to high-quality software creation.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                With a strong foundation in <span className="text-foreground font-medium">React</span>, 
-                <span className="text-foreground font-medium"> Node.js</span>, and efficient database 
+                With a strong foundation in <span className="text-foreground font-medium">React, Next.js</span>, 
+                <span className="text-foreground font-medium"> Node.js, TypeScript, Express,</span>, and efficient database 
                 management, I've successfully collaborated in agile environments, delivering impactful 
                 features and reducing delivery times significantly.
               </p>

@@ -7,6 +7,8 @@ import projectVirgas from "@/assets/Virgas.png";
 import projectCrossshield from "@/assets/Crossshieldhc.png";
 import projectClosestead from "@/assets/project-closestead.jpg";
 import projectImmigration from "@/assets/immigrationpath2canada.png";
+import projectEchez from "@/assets/project-echez.png";
+import projectFabrik from "@/assets/project-fabrik.png";
 
 interface Project {
   title: string;
@@ -20,6 +22,14 @@ interface Project {
 }
 
 const projects: Project[] = [
+  {
+    title: "Vertex Fabrik App",
+    description: "Fabrik enables developers and builders to build truly proactive, personalized consumer apps. Fabrik provides your agents with instant awareness and memory by unifying a user's entire digital life, guaranteed by our core Zero-Knowledge Architecture that never compromises privacy.",
+    image: projectFabrik,
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "ShadCN UI", "GitHub"],
+    liveUrl: "https://developers.getfabrik.ai/",
+    featured: true,
+  },
   {
     title: "Vertex AI Readiness Checker",
     description:
@@ -71,6 +81,13 @@ const projects: Project[] = [
     technologies: ["WordPress", "Custom CSS"],
     liveUrl: "https://immigrationpath2canada.com",
   },
+  {
+    title: "Echez Tech Hub",
+    description:
+      "A technology hub providing resources, mentorship, and support to aspiring developers and tech entrepreneurs in Nigeria.",
+    image: projectEchez,
+    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "React Query"],
+  }
 ];
 
 export function ProjectsSection() {
