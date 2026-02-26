@@ -55,7 +55,7 @@ export function HeroSection() {
               className="glass glass-hover px-8"
               asChild
             >
-              <a href="https://drive.google.com/file/d/1cFEWYBwIGQrqa9XQvKVozy--Td6X0uKA/view?usp=drive_link" download>
+              <a href="https://drive.google.com/file/d/1cFEWYBwIGQrqa9XQvKVozy--Td6X0uKA/view?usp=sharing" download>
                 <Download className="mr-2 h-4 w-4" />
                 Download CV
               </a>

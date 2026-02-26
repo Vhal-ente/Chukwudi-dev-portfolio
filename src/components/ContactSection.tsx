@@ -163,7 +163,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                   Get a copy of my resume for more details about my experience and skills.
                 </p>
                 <Button className="bg-gradient-primary text-primary-foreground" asChild>
-                  <a href="https://drive.google.com/file/d/1cFEWYBwIGQrqa9XQvKVozy--Td6X0uKA/view?usp=drive_link" download>
+                  <a href="https://drive.google.com/file/d/1cFEWYBwIGQrqa9XQvKVozy--Td6X0uKA/view?usp=sharing" download>
                     Download CV
                   </a>
                 </Button>
