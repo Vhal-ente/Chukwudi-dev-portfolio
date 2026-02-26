@@ -8,7 +8,7 @@ import projectCrossshield from "@/assets/Crossshieldhc.png";
 import projectClosestead from "@/assets/project-closestead.jpg";
 import projectImmigration from "@/assets/immigrationpath2canada.png";
 import projectEchez from "@/assets/project-echez.png";
-import projectFabrik from "@/assets/project-fabrik.png";
+import projectFabrik from "@/assets/fabrik-app.png";
 
 interface Project {
   title: string;

@@ -102,6 +102,9 @@ export function SkillsSection() {
                 "Problem Solving",
                 "Cross-functional Teams",
                 "Web Analytics",
+                "Vercel Deployment",
+                "cPanel"
+                
               ].map((skill) => (
                 <span
                   key={skill}
