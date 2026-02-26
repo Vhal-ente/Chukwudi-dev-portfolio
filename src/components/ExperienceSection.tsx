@@ -14,7 +14,7 @@ const experiences = [
   {
     company: "Safelto",
     role: "Frontend Engineer",
-    period: "March 2025 - Present",
+    period: "March 2025",
     location: "Remote",
     description: [
       "Designed and developed a smart community management platform using React.js, Tailwind CSS, and TypeScript",
@@ -24,7 +24,7 @@ const experiences = [
   {
     company: "Echez Tech Hub",
     role: "Frontend Engineer",
-    period: "January 2026 - Present",
+    period: "January 2026",
     location: "Remote",
     description: [
       "Contributed to the development of a technology hub platform using Next.js, TypeScript, Tailwind CSS, and React Query",

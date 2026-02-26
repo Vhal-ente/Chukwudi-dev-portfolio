@@ -43,8 +43,8 @@ export function AboutSection() {
                 in designing scalable solutions that contribute to high-quality software creation.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                With a strong foundation in <span className="text-foreground font-medium">React, Next.js</span>, 
-                <span className="text-foreground font-medium"> Node.js, TypeScript, Express,</span>, and efficient database 
+                With a strong foundation in <span className="text-foreground font-medium">React, Next.js,</span> 
+                <span className="text-foreground font-medium"> Node.js, TypeScript, Express,</span> and efficient database 
                 management, I've successfully collaborated in agile environments, delivering impactful 
                 features and reducing delivery times significantly.
               </p>
