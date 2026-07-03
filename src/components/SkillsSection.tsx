@@ -103,7 +103,8 @@ export function SkillsSection() {
                 "Cross-functional Teams",
                 "Web Analytics",
                 "Vercel Deployment",
-                "cPanel"
+                "cPanel",
+                "Microsoft Power Automate",
                 
               ].map((skill) => (
                 <span

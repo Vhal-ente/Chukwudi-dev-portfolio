@@ -9,6 +9,7 @@ import projectClosestead from "@/assets/project-closestead.jpg";
 import projectImmigration from "@/assets/immigrationpath2canada.png";
 import projectEchez from "@/assets/project-echez.png";
 import projectFabrik from "@/assets/fabrik-app.png";
+import projectBennettMemorial from "@/assets/bennett-memorial.png";
 
 interface Project {
   title: string;
@@ -80,6 +81,14 @@ const projects: Project[] = [
     image: projectImmigration,
     technologies: ["WordPress", "Custom CSS"],
     liveUrl: "https://immigrationpath2canada.com",
+  },
+  {
+    title: "Bennett Oguegbu Memorial",
+    description:
+      "A tribute and memorial website celebrating the life, legacy, gallery, and shared memories of Ogbueshi Bennett Amaechi Oguegbu.",
+    image: projectBennettMemorial,
+    technologies: ["React.js", "TypeScript", "Tailwind CSS"],
+    liveUrl: "https://bennettoguegbumemorial.com/",
   },
   {
     title: "Echez Tech Hub",
