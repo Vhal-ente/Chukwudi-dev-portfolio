@@ -7,8 +7,8 @@ import projectVirgas from "@/assets/Virgas.png";
 import projectCrossshield from "@/assets/Crossshieldhc.png";
 import projectClosestead from "@/assets/project-closestead.jpg";
 import projectImmigration from "@/assets/immigrationpath2canada.png";
-import projectEchez from "@/assets/project-echez.png";
 import projectFabrik from "@/assets/fabrik-app.png";
+import projectSca from "@/assets/sca-hero.png";
 import projectBennettMemorial from "@/assets/bennett-memorial.png";
 
 interface Project {
@@ -23,14 +23,14 @@ interface Project {
 }
 
 const projects: Project[] = [
-  {
-    title: "Vertex Fabrik App",
-    description: "Fabrik enables developers and builders to build truly proactive, personalized consumer apps. Fabrik provides your agents with instant awareness and memory by unifying a user's entire digital life, guaranteed by our core Zero-Knowledge Architecture that never compromises privacy.",
-    image: projectFabrik,
-    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "ShadCN UI", "GitHub"],
-    liveUrl: "https://developers.getfabrik.ai/",
-    featured: true,
-  },
+  // {
+  //   title: "Vertex Fabrik App",
+  //   description: "Fabrik enables developers and builders to build truly proactive, personalized consumer apps. Fabrik provides your agents with instant awareness and memory by unifying a user's entire digital life, guaranteed by our core Zero-Knowledge Architecture that never compromises privacy.",
+  //   image: projectFabrik,
+  //   technologies: ["Next.js", "TypeScript", "Tailwind CSS", "ShadCN UI", "GitHub"],
+  //   liveUrl: "https://developers.getfabrik.ai/",
+  //   featured: true,
+  // },
   {
     title: "Vertex AI Readiness Checker",
     description:
@@ -65,7 +65,7 @@ const projects: Project[] = [
     image: projectCrossshield,
     technologies: ["React.js", "Tailwind CSS", "TypeScript", "Adonis JS", "MySQL"],
     liveUrl: "https://crossshieldhc.com",
-    inProgress: true,
+    inProgress: false,
   },
   {
     title: "CloseStead",
@@ -91,12 +91,14 @@ const projects: Project[] = [
     liveUrl: "https://bennettoguegbumemorial.com/",
   },
   {
-    title: "Echez Tech Hub",
+    title: "SCA (Short Circuit Arena)",
     description:
-      "A technology hub providing resources, mentorship, and support to aspiring developers and tech entrepreneurs in Nigeria.",
-    image: projectEchez,
-    technologies: ["Next.js", "TypeScript", "Tailwind CSS", "React Query"],
-  }
+      "SCA hosts online tournaments and leagues where competitive gamers, teams, and communities come to play at their best. Built as a freelance/client project for Mightyness.",
+    image: projectSca,
+    technologies: ["React.js", "TypeScript", "Tailwind CSS"],
+    liveUrl: "https://sca-ivory.vercel.app",
+    githubUrl: "https://github.com/Vhal-ente/SCA",
+  },
 ];
 
 export function ProjectsSection() {

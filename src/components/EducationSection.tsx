@@ -25,6 +25,11 @@ const certifications = [
     issuer: "IEEE-NAU Skill up",
     icon: Award,
   },
+  {
+    name: "Cybersecurity — 4-Month Training Programme",
+    issuer: "TS Academy (Certified August 2026)",
+    icon: Award,
+  },
 ];
 
 export function EducationSection() {
