@@ -1,9 +1,5 @@
-import { Mail, Phone, MapPin, Github, Linkedin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Github, Linkedin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 
 const contactInfo = [
   {
@@ -39,62 +35,8 @@ const socialLinks = [
 ];
 
 export function ContactSection() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
-// In ContactSection.tsx - Update the handleSubmit function
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-
-  const form = e.currentTarget;
-  const formData = new FormData(form);
-  
-  // Get form data - ensure inputs have these 'name' attributes
-  const payload = {
-    name: formData.get('name') as string,
-    email: formData.get('email') as string,
-    subject: formData.get('subject') as string,
-    message: formData.get('message') as string,
-  };
-
-  try {
-    // USE YOUR RENDER BACKEND URL HERE
-    const backendUrl = import.meta.env?.VITE_API_URL || 'https://portfolio-backend.onrender.com';
-    
-    const response = await fetch(`${backendUrl}/api/contact`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      toast({
-        title: 'Success!',
-        description: result.message || 'Your message has been sent successfully.',
-        duration: 5000,
-      });
-      form.reset(); // Clear the form
-    } else {
-      throw new Error(result.error || 'Failed to send message');
-    }
-  } catch (error) {
-    console.error('Contact form error:', error);
-    toast({
-      title: 'Error',
-      description: 'Could not send your message. Please try again later.',
-      variant: 'destructive',
-      duration: 5000,
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  const whatsappUrl = "https://wa.me/qr/7CWU2BIAWM25I1";
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&color=000000&bgcolor=FFFFFF&data=${encodeURIComponent(whatsappUrl)}`;
 
   return (
     <section id="contact" className="py-20 md:py-32 relative bg-secondary/30">
@@ -170,65 +112,39 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="p-6 md:p-8 rounded-xl glass">
-              <h3 className="text-xl font-bold mb-6">Send a Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Name</label>
-                    <Input
-                    name="name"
-                      placeholder="Your name"
-                      required
-                      className="bg-background/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Email</label>
-                    <Input
-                    name="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      required
-                      className="bg-background/50"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Subject</label>
-                  <Input
-                  name="subject"
-                    placeholder="What's this about?"
-                    required
-                    className="bg-background/50"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Message</label>
-                  <Textarea
-                  name="message"
-                    placeholder="Your message..."
-                    rows={5}
-                    required
-                    className="bg-background/50 resize-none"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-primary text-primary-foreground"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    "Sending..."
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Message
-                    </>
-                  )}
-                </Button>
-              </form>
+            {/* WhatsApp QR Code */}
+            <div className="p-6 md:p-8 rounded-xl glass flex flex-col items-center justify-center text-center">
+              <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center mb-4">
+                <MessageCircle className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Message me on WhatsApp</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Scan this code with your phone camera to start a chat.
+              </p>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open WhatsApp chat"
+                className="rounded-xl bg-white p-3 shadow-lg transition-transform hover:scale-105"
+              >
+                <img
+                  src={qrCodeUrl}
+                  alt="QR code to start a WhatsApp chat"
+                  width={240}
+                  height={240}
+                  className="h-52 w-52 md:h-60 md:w-60"
+                />
+              </a>
+              <p className="text-sm text-muted-foreground mt-5 mb-4">
+                or chat directly at <span className="font-medium text-foreground">+234 903 937 2810</span>
+              </p>
+              <Button className="bg-gradient-primary text-primary-foreground" asChild>
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Open WhatsApp
+                </a>
+              </Button>
             </div>
           </div>
         </div>

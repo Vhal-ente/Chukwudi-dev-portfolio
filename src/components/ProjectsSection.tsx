@@ -96,7 +96,7 @@ const projects: Project[] = [
       "SCA hosts online tournaments and leagues where competitive gamers, teams, and communities come to play at their best. Built as a freelance/client project for Mightyness.",
     image: projectSca,
     technologies: ["React.js", "TypeScript", "Tailwind CSS"],
-    liveUrl: "https://sca-ivory.vercel.app",
+    liveUrl: "https://scarena.online/",
     githubUrl: "https://github.com/Vhal-ente/SCA",
   },
 ];

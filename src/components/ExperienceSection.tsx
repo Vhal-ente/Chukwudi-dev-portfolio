@@ -2,6 +2,14 @@ import { Briefcase, MapPin, Calendar } from "lucide-react";
 
 const experiences = [
   {
+    company: "Citidata Centre",
+    role: "Automation Workflow (Contract)",
+    period: "April 2026 - October 2026",
+    description: [
+      "Worked on an Internal Payment Memo automation workflow using microsoft power automate, SharePoint, and Microsoft forms to streamline the payment memo process",
+    ],
+  },
+  {
     company: "Vertex Software Corporation",
     role: "Frontend Engineer",
     period: "June 2025 - Present",
@@ -115,10 +123,12 @@ export function ExperienceSection() {
                         <Calendar className="h-3 w-3" />
                         {exp.period}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {exp.location}
-                      </span>
+                      {"location" in exp && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {exp.location}
+                        </span>
+                      )}
                     </div>
 
                     <ul className={`space-y-2 ${index % 2 === 0 ? "md:text-right" : ""}`}>
