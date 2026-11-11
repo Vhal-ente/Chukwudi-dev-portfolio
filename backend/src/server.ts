@@ -12,11 +12,34 @@ interface ContactFormData {
   message: string;
 }
 
+const htmlEscapes: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, character => htmlEscapes[character]);
+
 // ==================== INITIALIZE RESEND ====================
 const resend = new Resend(config.RESEND_API_KEY);
 
 // ==================== MIDDLEWARE ====================
 const app: Express = express();
+app.disable('x-powered-by');
+
+// Apply baseline protections to every API response.
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'");
+  if (config.isProduction) {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 
 // CORS configuration
 app.use(cors({
@@ -25,7 +48,7 @@ app.use(cors({
 }));
 
 // JSON body parsing
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Request logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -53,6 +76,13 @@ const MAX_REQUESTS_PER_WINDOW = config.constants.RATE_LIMIT_MAX_REQUESTS;
 const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
+
+  // Bound memory used by this in-process limiter when requests come from many IPs.
+  if (requestCounts.size > 10000) {
+    for (const [key, value] of requestCounts) {
+      if (now > value.resetTime) requestCounts.delete(key);
+    }
+  }
   
   if (!requestCounts.has(ip)) {
     requestCounts.set(ip, { 
@@ -91,7 +121,21 @@ const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) =>
 
 // ==================== REQUEST VALIDATION ====================
 const validateContactRequest = (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, subject, message } = req.body;
+  const body = req.body;
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    res.status(400).json({ success: false, error: 'A valid JSON object is required.' });
+    return;
+  }
+
+  const { name, email, subject, message } = body;
+  if (![name, email, subject, message].every(value => typeof value === 'string')) {
+    res.status(400).json({
+      success: false,
+      error: 'Name, email, subject, and message must be text.',
+      timestamp: new Date().toISOString(),
+    });
+    return;
+  }
   
   if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
     res.status(400).json({ 
@@ -192,6 +236,10 @@ app.post('/api/contact',
   async (req: Request<{}, {}, ContactFormData>, res: Response) => {
     
   const { name, email, subject, message } = req.body;
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
   
   try {
     // 1. Send email to yourself (portfolio owner)
@@ -199,7 +247,7 @@ app.post('/api/contact',
       from: config.FROM_EMAIL,
       to: config.TO_EMAIL,
       replyTo: email,
-      subject: `📨 Portfolio Contact: ${subject}`,
+      subject: `📨 Portfolio Contact: ${subject.replace(/[\r\n]+/g, ' ')}`,
       html: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -208,19 +256,19 @@ app.post('/api/contact',
   
   <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #eee;">
     <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-      <p><strong>👤 Name:</strong> ${name}</p>
-      <p><strong>📧 Email:</strong> <a href="mailto:${email}" style="color: #667eea;">${email}</a></p>
-      <p><strong>📝 Subject:</strong> ${subject}</p>
+      <p><strong>👤 Name:</strong> ${safeName}</p>
+      <p><strong>📧 Email:</strong> <a href="mailto:${safeEmail}" style="color: #667eea;">${safeEmail}</a></p>
+      <p><strong>📝 Subject:</strong> ${safeSubject}</p>
     </div>
     
     <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
       <h3 style="margin-top: 0; color: #555;">Message:</h3>
-      <div style="white-space: pre-wrap;">${message.replace(/\n/g, '<br>')}</div>
+      <div style="white-space: pre-wrap;">${safeMessage}</div>
     </div>
     
     <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 12px;">
       <p>Sent from your portfolio contact form</p>
-      <p><a href="mailto:${email}" style="color: #667eea;">Reply to ${name}</a></p>
+      <p><a href="mailto:${safeEmail}" style="color: #667eea;">Reply to ${safeName}</a></p>
     </div>
   </div>
 </div>
@@ -251,7 +299,7 @@ Sent from your portfolio contact form at ${new Date().toISOString()}
         const userEmail = await resend.emails.send({
           from: config.FROM_EMAIL,
           to: email,
-          subject: `Thanks for your message: ${subject}`,
+          subject: `Thanks for your message: ${subject.replace(/[\r\n]+/g, ' ')}`,
           html: `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0; color: white;">
@@ -259,11 +307,11 @@ Sent from your portfolio contact form at ${new Date().toISOString()}
   </div>
   
   <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-    <p>Hello <strong>${name}</strong>,</p>
+    <p>Hello <strong>${safeName}</strong>,</p>
     <p>Thank you for reaching out through my portfolio website!</p>
     
     <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
-      <p>I've received your message regarding <strong>"${subject}"</strong> and will review it shortly.</p>
+      <p>I've received your message regarding <strong>"${safeSubject}"</strong> and will review it shortly.</p>
       <p>I typically respond within <strong>24-48 hours</strong>.</p>
     </div>
     
